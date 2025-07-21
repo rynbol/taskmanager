@@ -1,0 +1,109 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.3'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.openapi.generator' version '7.5.0'
+	id 'jacoco'
+}
+
+group = 'com.assignment'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+	testImplementation 'com.h2database:h2'
+}
+
+tasks.withType(JavaCompile) {
+    dependsOn 'openApiGenerate'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required = false
+		csv.required = false
+		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+	}
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+				'**/model/**',
+				'**/api/**',
+				'**/TaskmanagerApplication.class'
+			])
+		}))
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				minimum = 0.80
+			}
+		}
+	}
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+				'**/model/**',
+				'**/api/**',
+				'**/TaskmanagerApplication.class'
+			])
+		}))
+	}
+}
+
+check.dependsOn jacocoTestCoverageVerification
+
+openApiGenerate {
+    generatorName = "spring"
+    inputSpec = "$projectDir/openapi.yaml".toString() // Assumes openapi.yaml is in your root folder
+    outputDir = "$buildDir/generated".toString()
+    apiPackage = "com.assignment.taskmanager.api"
+    modelPackage = "com.assignment.taskmanager.model"
+    configOptions = [
+            useSpringBoot3: "true",
+            interfaceOnly: "true",
+            useJakartaEe: "true",
+            openApiNullable: "false" 
+    ]
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir "$buildDir/generated/src/main/java"
+        }
+    }
+}

@@ -1,0 +1,73 @@
+# version: "3.8"
+
+# services:
+#   # The MySQL Database Service
+#   db:
+#     image: mysql:8.0
+#     container_name: mysql-db
+#     ports:
+#       - "3306:3306" # Expose MySQL port to the host machine for debugging
+#     environment:
+#       MYSQL_DATABASE: "taskdb"
+#       MYSQL_USER: "user"
+#       MYSQL_PASSWORD: "password"
+#       MYSQL_ROOT_PASSWORD: "rootpassword"
+#     volumes:
+#       - db_data:/var/lib/mysql
+
+#   # The Spring Boot Application Service
+#   app:
+#     build: . # Build the image from the Dockerfile in the current directory
+#     container_name: spring-boot-app
+#     ports:
+#       - "8080:8080" # Expose the app's port
+#     depends_on:
+#       - db # Wait for the db service to be ready before starting
+#     environment:
+#       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/taskdb?useSSL=false&allowPublicKeyRetrieval=true
+#       - SPRING_DATASOURCE_USERNAME=user
+#       - SPRING_DATASOURCE_PASSWORD=password
+
+# volumes:
+#   db_data:
+
+# REMOVED the version attribute as it's obsolete
+
+services:
+  # The MySQL Database Service
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: "taskdb"
+      MYSQL_USER: "user"
+      MYSQL_PASSWORD: "password"
+      MYSQL_ROOT_PASSWORD: "rootpassword"
+    volumes:
+      - db_data:/var/lib/mysql
+    # --- THIS IS THE NEW PART ---
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # The Spring Boot Application Service
+  app:
+    build: .
+    container_name: spring-boot-app
+    ports:
+      - "8080:8080"
+    # --- THIS PART IS MODIFIED ---
+    depends_on:
+      db:
+        condition: service_healthy # This now waits for the healthcheck to pass
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/taskdb?useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+
+volumes:
+  db_data:
