@@ -10,22 +10,6 @@ jobs:
   test:
     name: Test and Coverage
     runs-on: ubuntu-latest
-    
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: rootpass
-          MYSQL_DATABASE: taskmanager
-          MYSQL_USER: taskuser
-          MYSQL_PASSWORD: taskpass
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
 
     steps:
     - name: Checkout code
@@ -50,23 +34,8 @@ jobs:
     - name: Make gradlew executable
       run: chmod +x ./gradlew
 
-    - name: Wait for MySQL to be ready
-      run: |
-        for i in {1..30}; do
-          if mysqladmin ping -h 127.0.0.1 -P 3306 -u root -prootpass --silent; then
-            echo "MySQL is ready"
-            break
-          fi
-          echo "Waiting for MySQL... ($i/30)"
-          sleep 2
-        done
-
     - name: Run tests with coverage
       run: ./gradlew clean test jacocoTestReport jacocoTestCoverageVerification
-      env:
-        SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/taskmanager
-        SPRING_DATASOURCE_USERNAME: taskuser
-        SPRING_DATASOURCE_PASSWORD: taskpass
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
