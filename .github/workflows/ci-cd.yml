@@ -91,7 +91,7 @@ jobs:
       run: docker save taskmanager:${{ github.sha }} | gzip > taskmanager-image.tar.gz
 
     - name: Upload Docker image artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: docker-image
         path: taskmanager-image.tar.gz
@@ -107,7 +107,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Download Docker image artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: docker-image
 
@@ -148,7 +148,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Download Docker image artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: docker-image
 
