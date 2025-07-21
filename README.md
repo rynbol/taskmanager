@@ -245,7 +245,7 @@ Throughout development, I focused on performance and maintainability improvement
 
 This project was a fantastic learning experience that pushed me to grow as an aspiring backend developer:
 
-**Spring Boot Mastery**: I gained deep understanding of Spring Boot's auto-configuration and learned how to properly structure a production-ready application. The most "aha!" moment was realizing how Spring's dependency injection creates truly testable and maintainable code.
+**Spring Boot Mastery**: I gained deep understanding of Spring Boot's auto-configuration and learned how to properly structure a production-ready application. As someone new to Spring Boot, I gained understanding of its auto-configuration and core architectural patterns. Through this project, I learned how to structure a maintainable and scalable backend application, and became comfortable with many of the libraries and conventions that power modern Spring Boot development.
 
 **Testing Philosophy**: Initially, I focused on hitting coverage numbers, but I learned that meaningful tests that verify business logic are far more valuable than tests that just exercise code paths. Writing integration tests that simulate real user workflows taught me to think like an end user.
 
